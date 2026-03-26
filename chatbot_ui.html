@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>북이 — 진로 맞춤 도서 멘토</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:       #0d0c0b;
+  --s1:       #171614;
+  --s2:       #201e1c;
+  --s3:       #2a2724;
+  --b:        #302d2a;
+  --acc:      #c8965a;
+  --acc2:     #e4b278;
+  --txt:      #e6ddd4;
+  --mute:     #7a7067;
+  --green:    #4caf82;
+  --purple:   #9b87d4;
+  --blue:     #5b9bd5;
+  --r:        12px;
+}
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  overflow: hidden;
+}
+
+/* ===== 사이드바 ===== */
+#sidebar {
+  background: var(--s1);
+  border-right: 1px solid var(--b);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+#sidebar::-webkit-scrollbar { width: 3px; }
+#sidebar::-webkit-scrollbar-thumb { background: var(--b); }
+
+.logo {
+  padding: 22px 18px 16px;
+  border-bottom: 1px solid var(--b);
+}
+.logo h1 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--acc);
+}
+.logo p { font-size: 11px; color: var(--mute); margin-top: 3px; }
+
+.section { padding: 16px 14px; border-bottom: 1px solid var(--b); }
+.sec-title {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.4px;
+  color: var(--mute);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+/* 프로필 폼 */
+.form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.form-row label { font-size: 11px; color: var(--mute); }
+.form-row input, .form-row select {
+  background: var(--s2);
+  border: 1px solid var(--b);
+  color: var(--txt);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .2s;
+  width: 100%;
+}
+.form-row input:focus, .form-row select:focus { border-color: var(--acc); }
+.form-row select option { background: var(--s2); }
+
+.btn-primary {
+  width: 100%;
+  padding: 10px;
+  background: var(--acc);
+  color: #0d0c0b;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .2s;
+  margin-top: 4px;
+}
+.btn-primary:hover { background: var(--acc2); }
+
+.btn-secondary {
+  width: 100%;
+  padding: 9px;
+  background: transparent;
+  border: 1px solid var(--b);
+  color: var(--txt);
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .2s;
+}
+.btn-secondary:hover { border-color: var(--purple); color: var(--purple); }
+
+/* 프로필 뱃지 */
+#profile-badge {
+  display: none;
+  background: var(--s2);
+  border: 1px solid var(--b);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+#profile-badge .badge-name { font-size: 14px; font-weight: 500; color: var(--acc2); }
+#profile-badge .badge-info { font-size: 11px; color: var(--mute); margin-top: 3px; line-height: 1.6; }
+
+/* 검색 */
+.search-row { display: flex; gap: 6px; }
+.search-row input {
+  flex: 1;
+  background: var(--s2);
+  border: 1px solid var(--b);
+  color: var(--txt);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  min-width: 0;
+  transition: border-color .2s;
+}
+.search-row input:focus { border-color: var(--acc); }
+.search-row input::placeholder { color: var(--mute); }
+.search-row button {
+  background: var(--acc);
+  color: #0d0c0b;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: background .2s;
+}
+.search-row button:hover { background: var(--acc2); }
+
+/* 책 카드 */
+#book-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.book-card {
+  display: flex;
+  gap: 9px;
+  padding: 9px;
+  background: var(--s2);
+  border: 1px solid var(--b);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.book-card:hover { border-color: var(--acc); }
+.book-thumb {
+  width: 36px; height: 50px;
+  background: var(--s3);
+  border-radius: 3px;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.book-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.book-info .b-title {
+  font-size: 12px; font-weight: 500; line-height: 1.4;
+  overflow: hidden; display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.book-info .b-author { font-size: 11px; color: var(--mute); margin-top: 2px; }
+
+.clear-btn {
+  margin: 12px 14px;
+  padding: 9px;
+  background: transparent;
+  border: 1px solid var(--b);
+  color: var(--mute);
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .2s;
+  width: calc(100% - 28px);
+}
+.clear-btn:hover { border-color: #e74c3c44; color: #e74c3c; }
+
+/* ===== 메인 영역 ===== */
+#main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#top-bar {
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--b);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--s1);
+  flex-shrink: 0;
+}
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+#top-bar .bot-name { font-size: 14px; font-weight: 500; }
+#top-status { font-size: 12px; color: var(--mute); margin-left: auto; }
+
+/* 탭 */
+#tabs {
+  display: flex;
+  border-bottom: 1px solid var(--b);
+  background: var(--s1);
+  flex-shrink: 0;
+}
+.tab-btn {
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--mute);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .2s;
+}
+.tab-btn.active { color: var(--acc2); border-bottom-color: var(--acc); }
+.tab-btn:hover:not(.active) { color: var(--txt); }
+
+/* 탭 패널 */
+.tab-panel { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+.tab-panel.active { display: flex; }
+
+/* 채팅 패널 */
+#messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  scroll-behavior: smooth;
+}
+#messages::-webkit-scrollbar { width: 3px; }
+#messages::-webkit-scrollbar-thumb { background: var(--b); }
+
+.msg { display: flex; gap: 10px; max-width: 80%; animation: msgIn .25s ease; }
+@keyframes msgIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+.msg.user { margin-left: auto; flex-direction: row-reverse; }
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--s2); border: 1px solid var(--b);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0; margin-top: 2px;
+}
+.msg.user .avatar { background: #1a2218; border-color: #243224; }
+.bubble {
+  background: var(--s1);
+  border: 1px solid var(--b);
+  border-radius: 13px;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.msg.user .bubble { background: #1a2218; border-color: #243224; color: #a8d4a0; }
+.typing { display:flex; gap:4px; align-items:center; padding: 2px 0; }
+.typing span {
+  width: 5px; height: 5px; background: var(--mute); border-radius: 50%;
+  animation: bounce 1.1s ease infinite;
+}
+.typing span:nth-child(2) { animation-delay: .18s; }
+.typing span:nth-child(3) { animation-delay: .36s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+/* 입력창 */
+#input-area {
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--b);
+  display: flex; gap: 8px;
+  background: var(--s1);
+  flex-shrink: 0;
+}
+#msg-input {
+  flex: 1;
+  background: var(--s2);
+  border: 1px solid var(--b);
+  color: var(--txt);
+  border-radius: 11px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  line-height: 1.5;
+  min-height: 44px;
+  max-height: 120px;
+  transition: border-color .2s;
+}
+#msg-input:focus { border-color: var(--acc); }
+#msg-input::placeholder { color: var(--mute); }
+#send-btn {
+  background: var(--acc);
+  color: #0d0c0b;
+  border: none;
+  border-radius: 11px;
+  width: 44px; height: 44px;
+  font-size: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  align-self: flex-end;
+  transition: background .2s, transform .1s;
+}
+#send-btn:hover { background: var(--acc2); transform: scale(1.05); }
+#send-btn:disabled { background: var(--b); cursor: not-allowed; transform: none; }
+
+/* 로드맵 패널 */
+#roadmap-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 24px;
+}
+#roadmap-panel::-webkit-scrollbar { width: 3px; }
+#roadmap-panel::-webkit-scrollbar-thumb { background: var(--b); }
+
+.roadmap-header { margin-bottom: 24px; }
+.roadmap-header h2 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 20px;
+  color: var(--acc);
+  margin-bottom: 6px;
+}
+.roadmap-header p { font-size: 13px; color: var(--mute); }
+
+#roadmap-generate-btn {
+  padding: 11px 24px;
+  background: var(--purple);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity .2s;
+  margin-bottom: 24px;
+}
+#roadmap-generate-btn:hover { opacity: .85; }
+#roadmap-generate-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+.roadmap-stage {
+  display: flex;
+  gap: 0;
+  margin-bottom: 0;
+  position: relative;
+}
+.stage-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+.stage-dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500;
+  flex-shrink: 0;
+}
+.stage-dot.s1 { background: #1e3040; border: 2px solid var(--blue); color: var(--blue); }
+.stage-dot.s2 { background: #2a2040; border: 2px solid var(--purple); color: var(--purple); }
+.stage-dot.s3 { background: #1e3028; border: 2px solid var(--green); color: var(--green); }
+.stage-line {
+  width: 2px;
+  flex: 1;
+  min-height: 20px;
+  background: var(--b);
+  margin: 4px 0;
+}
+.stage-card {
+  flex: 1;
+  background: var(--s1);
+  border: 1px solid var(--b);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.stage-card .s-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.stage-card .s-stage { font-size: 11px; color: var(--mute); }
+.stage-card .s-title { font-size: 15px; font-weight: 500; }
+.stage-card .s-period { font-size: 11px; color: var(--mute); margin-left: auto; }
+.stage-card .s-goal {
+  font-size: 13px; color: var(--mute); margin-bottom: 12px;
+  padding-left: 10px; border-left: 2px solid var(--b);
+}
+.stage-sub { font-size: 10px; font-weight: 500; letter-spacing: 1px; color: var(--mute); text-transform: uppercase; margin-bottom: 6px; margin-top: 10px; }
+.stage-books { display: flex; flex-direction: column; gap: 4px; }
+.stage-book {
+  font-size: 13px;
+  padding: 5px 9px;
+  background: var(--s2);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .15s;
+  color: var(--acc2);
+}
+.stage-book:hover { background: var(--s3); }
+.stage-actions { display: flex; flex-direction: column; gap: 4px; }
+.stage-action {
+  font-size: 13px;
+  padding: 5px 9px;
+  background: var(--s2);
+  border-radius: 6px;
+  color: var(--txt);
+  display: flex; align-items: center; gap: 7px;
+}
+.stage-action::before { content: "→"; color: var(--green); font-size: 12px; }
+
+.advice-box {
+  margin-top: 8px;
+  padding: 14px 16px;
+  background: var(--s2);
+  border: 1px solid var(--b);
+  border-left: 3px solid var(--acc);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--acc2);
+  font-style: italic;
+  line-height: 1.7;
+}
+
+/* 환영 화면 */
+#welcome {
+  margin: auto;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  opacity: .6;
+}
+#welcome .big { font-size: 44px; }
+#welcome h2 { font-family: 'Noto Serif KR', serif; font-size: 20px; color: var(--acc); }
+#welcome p { font-size: 13px; color: var(--mute); line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<!-- 사이드바 -->
+<aside id="sidebar">
+  <div class="logo">
+    <h1>📚 북이</h1>
+    <p>진로 맞춤 AI 도서 멘토</p>
+  </div>
+
+  <!-- 프로필 입력 -->
+  <div class="section">
+    <p class="sec-title">내 프로필</p>
+
+    <div id="profile-badge">
+      <div class="badge-name" id="badge-name"></div>
+      <div class="badge-info" id="badge-info"></div>
+    </div>
+
+    <div class="form-row">
+      <label>이름</label>
+      <input type="text" id="p-name" placeholder="예: 김민준">
+    </div>
+    <div class="form-row">
+      <label>학년</label>
+      <select id="p-grade">
+        <option value="고1">고1</option>
+        <option value="고2">고2</option>
+        <option value="고3" selected>고3</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>희망 진로</label>
+      <input type="text" id="p-career" placeholder="예: AI 개발자, 의사, 교사...">
+    </div>
+    <div class="form-row">
+      <label>독서 수준</label>
+      <select id="p-level">
+        <option value="입문">입문 — 해당 분야 처음</option>
+        <option value="중급" selected>중급 — 기초는 알고 있음</option>
+        <option value="심화">심화 — 전공 수준 도전</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="saveProfile()">프로필 저장 & 시작</button>
+  </div>
+
+  <!-- 도서 검색 -->
+  <div class="section">
+    <p class="sec-title">도서 검색</p>
+    <div class="search-row">
+      <input type="text" id="search-input" placeholder="책 제목 / 키워드">
+      <button onclick="searchBooks()">검색</button>
+    </div>
+    <div id="book-list">
+      <p style="font-size:12px;color:var(--mute);padding:6px 2px">프로필 저장 후 검색해보세요</p>
+    </div>
+  </div>
+
+  <button class="clear-btn" onclick="clearChat()">🗑 대화 초기화</button>
+</aside>
+
+<!-- 메인 -->
+<main id="main">
+  <div id="top-bar">
+    <div class="status-dot"></div>
+    <span class="bot-name">북이</span>
+    <span id="top-status">프로필을 먼저 입력해주세요</span>
+  </div>
+
+  <div id="tabs">
+    <button class="tab-btn active" onclick="showTab('chat')">💬 대화</button>
+    <button class="tab-btn" onclick="showTab('roadmap')">🗺 진로 로드맵</button>
+  </div>
+
+  <!-- 채팅 탭 -->
+  <div class="tab-panel active" id="tab-chat">
+    <div id="messages">
+      <div id="welcome">
+        <div class="big">📖</div>
+        <h2>안녕하세요!</h2>
+        <p>왼쪽에서 프로필을 입력하면<br>나에게 맞는 도서를 추천해드릴게요.<br><br>진로와 수준에 꼭 맞는 책 + 다음 행동까지!</p>
+      </div>
+    </div>
+    <div id="input-area">
+      <textarea id="msg-input" placeholder="궁금한 것, 읽고 싶은 책 분야를 말해보세요" rows="1"></textarea>
+      <button id="send-btn" onclick="sendMsg()">↑</button>
+    </div>
+  </div>
+
+  <!-- 로드맵 탭 -->
+  <div class="tab-panel" id="tab-roadmap">
+    <div id="roadmap-panel">
+      <div class="roadmap-header">
+        <h2>나만의 진로 로드맵</h2>
+        <p>프로필을 저장한 후 아래 버튼을 누르면 AI가 3단계 로드맵을 만들어줘요.</p>
+      </div>
+      <button id="roadmap-generate-btn" onclick="generateRoadmap()">✨ 로드맵 생성하기</button>
+      <div id="roadmap-content"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+const SERVER  = "http://127.0.0.1:5000";
+const USER_ID = "u_" + Math.random().toString(36).slice(2, 8);
+let loading   = false;
+let hasProfile = false;
+
+// ===== 탭 전환 =====
+function showTab(name) {
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + name).classList.add("active");
+  event.target.classList.add("active");
+}
+
+// ===== 프로필 저장 =====
+async function saveProfile() {
+  const name   = document.getElementById("p-name").value.trim() || "학생";
+  const grade  = document.getElementById("p-grade").value;
+  const career = document.getElementById("p-career").value.trim() || "미정";
+  const level  = document.getElementById("p-level").value;
+
+  try {
+    await fetch(`${SERVER}/profile`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: USER_ID, name, grade, career, level })
+    });
+
+    hasProfile = true;
+    document.getElementById("top-status").textContent = `${name} | ${career} | ${level}`;
+    document.getElementById("badge-name").textContent = `${name} (${grade})`;
+    document.getElementById("badge-info").textContent = `진로: ${career}\n수준: ${level}`;
+    document.getElementById("profile-badge").style.display = "block";
+
+    document.getElementById("welcome")?.remove();
+    addMsg("ai", `안녕하세요, ${name}님! 저는 북이예요 📚\n\n${career} 분야로 나아가는 ${name}님을 위해, ${level} 수준에 딱 맞는 책을 추천해드릴게요.\n\n궁금한 분야나 읽고 싶은 주제가 있으면 말해보세요!`);
+
+  } catch(e) {
+    alert("서버에 연결할 수 없어요. chatbot_server.py를 먼저 실행해주세요.");
+  }
+}
+
+// ===== 채팅 =====
+async function sendMsg() {
+  const ta  = document.getElementById("msg-input");
+  const txt = ta.value.trim();
+  if (!txt || loading) return;
+  ta.value = "";
+  autoH(ta);
+  await callChat(txt, "");
+}
+
+async function searchBooks() {
+  const q = document.getElementById("search-input").value.trim();
+  if (!q) return;
+  showTab("chat");
+  document.querySelector(".tab-btn").classList.add("active");
+  await callChat(`"${q}" 관련 책을 추천해줘`, q);
+}
+
+async function callChat(msg, searchQ) {
+  if (loading) return;
+  loading = true;
+
+  document.getElementById("welcome")?.remove();
+  addMsg("user", msg);
+  const lid = addLoading();
+  setStatus("답변 생성 중...");
+  document.getElementById("send-btn").disabled = true;
+
+  try {
+    const res  = await fetch(`${SERVER}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: USER_ID, message: msg, search_query: searchQ })
+    });
+    const data = await res.json();
+    removeLoading(lid);
+    addMsg("ai", data.reply);
+    if (data.books?.length) renderBooks(data.books);
+    setStatus(hasProfile ? `${data.profile?.name || ""} | ${data.profile?.career || ""} | ${data.profile?.level || ""}` : "준비됨");
+  } catch(e) {
+    removeLoading(lid);
+    addMsg("ai", "⚠ 서버에 연결할 수 없어요.\nchatbot_server.py 실행 여부를 확인해주세요.");
+    setStatus("연결 오류");
+  }
+
+  loading = false;
+  document.getElementById("send-btn").disabled = false;
+}
+
+// ===== 로드맵 생성 =====
+async function generateRoadmap() {
+  const btn = document.getElementById("roadmap-generate-btn");
+  btn.disabled = true;
+  btn.textContent = "로드맵 생성 중...";
+  document.getElementById("roadmap-content").innerHTML =
+    `<p style="color:var(--mute);font-size:13px">AI가 맞춤 로드맵을 만들고 있어요...</p>`;
+
+  try {
+    const res  = await fetch(`${SERVER}/roadmap`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: USER_ID })
+    });
+    const data = await res.json();
+
+    if (data.status === "ok" && data.roadmap) {
+      renderRoadmap(data.roadmap, data.advice);
+    } else {
+      document.getElementById("roadmap-content").innerHTML =
+        `<p style="color:#e74c3c;font-size:13px">로드맵 생성 실패: ${data.message || "알 수 없는 오류"}</p>`;
+    }
+  } catch(e) {
+    document.getElementById("roadmap-content").innerHTML =
+      `<p style="color:#e74c3c;font-size:13px">서버 연결 실패</p>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = "✨ 다시 생성하기";
+}
+
+function renderRoadmap(stages, advice) {
+  const dotClass = ["s1", "s2", "s3"];
+  let html = "";
+
+  stages.forEach((stage, i) => {
+    const isLast = i === stages.length - 1;
+    const books  = (stage.books || []).map(b =>
+      `<div class="stage-book" onclick="askAboutBook('${esc(b)}')">${esc(b)}</div>`
+    ).join("");
+    const actions = (stage.actions || []).map(a =>
+      `<div class="stage-action">${esc(a)}</div>`
+    ).join("");
+
+    html += `
+      <div class="roadmap-stage">
+        <div class="stage-connector">
+          <div class="stage-dot ${dotClass[i] || 's1'}">${i + 1}</div>
+          ${!isLast ? '<div class="stage-line"></div>' : ""}
+        </div>
+        <div class="stage-card">
+          <div class="s-header">
+            <span class="s-stage">${esc(stage.stage)}</span>
+            <span class="s-title">${esc(stage.title)}</span>
+            <span class="s-period">${esc(stage.period)}</span>
+          </div>
+          <div class="s-goal">${esc(stage.goal)}</div>
+          <div class="stage-sub">추천 도서</div>
+          <div class="stage-books">${books}</div>
+          <div class="stage-sub">다음 행동</div>
+          <div class="stage-actions">${actions}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  if (advice) {
+    html += `<div class="advice-box">"${esc(advice)}"</div>`;
+  }
+
+  document.getElementById("roadmap-content").innerHTML = html;
+}
+
+function askAboutBook(title) {
+  showTab("chat");
+  document.querySelectorAll(".tab-btn")[0].classList.add("active");
+  document.querySelectorAll(".tab-btn")[1].classList.remove("active");
+  document.getElementById("msg-input").value = `《${title}》에 대해 자세히 알려줘`;
+  document.getElementById("msg-input").focus();
+}
+
+async function clearChat() {
+  if (!confirm("대화 기록을 초기화할까요?")) return;
+  try {
+    await fetch(`${SERVER}/clear`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: USER_ID })
+    });
+  } catch(e) {}
+  document.getElementById("messages").innerHTML =
+    `<div style="text-align:center;font-size:12px;color:var(--mute);margin-top:20px">대화가 초기화되었습니다.</div>`;
+}
+
+// ===== UI 헬퍼 =====
+function addMsg(role, text) {
+  const msgs = document.getElementById("messages");
+  const d    = document.createElement("div");
+  d.className = `msg ${role}`;
+  d.innerHTML = `<div class="avatar">${role === "user" ? "👤" : "📚"}</div><div class="bubble">${esc(text)}</div>`;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+let lid = 0;
+function addLoading() {
+  const id = "l" + (++lid);
+  const d  = document.createElement("div");
+  d.id = id; d.className = "msg ai";
+  d.innerHTML = `<div class="avatar">📚</div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  document.getElementById("messages").appendChild(d);
+  document.getElementById("messages").scrollTop = 99999;
+  return id;
+}
+function removeLoading(id) { document.getElementById(id)?.remove(); }
+
+function renderBooks(books) {
+  document.getElementById("book-list").innerHTML = books.map(b => `
+    <div class="book-card" onclick="askAboutBook('${esc(b.title)}')">
+      <div class="book-thumb">${b.cover ? `<img src="${b.cover}" onerror="this.parentNode.textContent='📗'">` : "📗"}</div>
+      <div class="book-info">
+        <div class="b-title">${esc(b.title)}</div>
+        <div class="b-author">${esc(b.author)}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function setStatus(t) { document.getElementById("top-status").textContent = t; }
+function esc(t) {
+  if (!t) return "";
+  return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+const ta = document.getElementById("msg-input");
+ta.addEventListener("input", () => autoH(ta));
+ta.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+});
+document.getElementById("search-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") searchBooks();
+});
+function autoH(el) { el.style.height = "auto"; el.style.height = Math.min(el.scrollHeight, 120) + "px"; }
+</script>
+</body>
+</html>
